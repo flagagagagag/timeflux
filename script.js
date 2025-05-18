@@ -16,15 +16,8 @@ const dropSound = new Audio('assets/dropSound.mp3');
 
 let intervalId = null;
 
-// function resizeCanvasToFullScreen() {
-//     // Setze Zeichenfläche auf echte Größe des Browserfensters
-//     clockCanvasWidth = window.innerWidth;
-//     clockCanvasHeight = window.innerHeight;
 
-//     clockCanvasWidth = clockCanvas.width;
-//     clockCanvasHeight = clockCanvas.height;
-// }
-
+//  Uhr passt sich an Fenstergröße an / Code von ChatGPT
 function resizeCanvasToFullScreen() {
     const dpr = window.devicePixelRatio || 1; // z. B. 2 bei Retina
 
@@ -57,13 +50,6 @@ function clearCanvas(bg = "black") {
 }
 
 function drawSeconds(currentDate) {
-    // Schrittweise erhöhen (z. B. 0.05 = ca. 2.8°)
-    // let startAngle = 0;
-    // let endAngle = 0;
-    // if (endAngle < Math.PI * 2) {
-    //     endAngle += 0.05;
-    //     requestAnimationFrame(drawAnimatedCircle);
-    // }
 
     const currentAmountOfSeconds = currentDate.getSeconds();
     let secondX = (secondsCircleRadius * Math.cos(Math.PI / 2)) + (clockCanvasWidth / 2);
@@ -160,14 +146,20 @@ function clockLoop() {
     timeDisplay.innerHTML = "Es ist " + currentDate.getHours() + ":" + currentDate.getMinutes() + ":" + currentDate.getSeconds() + " Uhr.";
 }
 
+/*  User inputs / Tastenkürzel:
+    "Enter" = beginnt das Programm und startet die Uhr
+    "w"     = färbt die Kreise weiß ein 
+    "g"     = färbt die Kreise grau ein 
+    "b"     = färbt die Kreise schwarz ein 
+*/
 window.addEventListener("resize", resizeCanvasToFullScreen);
 document.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
         resizeCanvasToFullScreen();
         clockLoop();
-    }
-    if (intervalId === null) {
-        intervalId = setInterval(clockLoop, 1000);
+        if (intervalId === null) {
+            intervalId = setInterval(clockLoop, 1000);
+        }
     }
     if (event.key === "w") {
         clockContext.strokeStyle = "white";
