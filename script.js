@@ -12,7 +12,9 @@ const secondsCircleRadius = clockCanvasHeight / 2;
 const minutesCircleRadius = clockCanvasHeight / 3.5;
 const hoursCircleRadius = clockCanvasHeight / 8;
 
-const dropSound = new Audio('assets/dropSound.mp3');
+const secondsSound = new Audio('assets/secondsSound.mp3'); //https://pixabay.com/de/sound-effects/slow-cinematic-clock-ticking-tension-2-323078/
+const minutesSound = new Audio('assets/minutesSound.mp3'); //https://pixabay.com/de/sound-effects/tibetan-gong-sound-effect-311179/
+const hoursSound = new Audio('assets/hoursSound.mp3'); //https://pixabay.com/de/sound-effects/black-gong-28936/
 
 let intervalId = null;
 
@@ -136,8 +138,17 @@ function drawCircles() {
 }
 
 function clockLoop() {
-    dropSound.play();
     const currentDate = new Date;
+    if (currentDate.getSeconds() !== 0) {
+        secondsSound.currentTime = 0;
+        secondsSound.play();
+    }else if (currentDate.getMinutes() !== 0){
+        minutesSound.currentTime = 0;
+        minutesSound.play();
+    }else {
+        hoursSound.currentTime = 0;
+        hoursSound.play();
+    }
     clearCanvas();
     drawCircles();
     drawSeconds(currentDate);

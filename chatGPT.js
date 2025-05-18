@@ -6,6 +6,11 @@ let width, height;
 let secondsRadius, minutesRadius, hoursRadius;
 let secondBlobs = [], minuteBlobs = [], hourBlobs = [];
 
+const secondsSound = new Audio('assets/secondsSound.mp3'); //https://pixabay.com/de/sound-effects/slow-cinematic-clock-ticking-tension-2-323078/
+const minutesSound = new Audio('assets/minutesSound.mp3'); //https://pixabay.com/de/sound-effects/tibetan-gong-sound-effect-311179/
+const hoursSound = new Audio('assets/hoursSound.mp3'); //https://pixabay.com/de/sound-effects/black-gong-28936/
+
+
 function resizeCanvas() {
   const dpr = window.devicePixelRatio || 1;
   width = window.innerWidth;
@@ -102,6 +107,16 @@ function animate() {
 
 function updateTime() {
   const now = new Date();
+  if (now.getSeconds() !== 0) {
+      secondsSound.currentTime = 0;
+      secondsSound.play();
+  }else if (now.getMinutes() !== 0){
+    minutesSound.currentTime = 0;
+    minutesSound.play();
+}else {
+    hoursSound.currentTime = 0;
+    hoursSound.play();
+}
   updateBlobs(secondBlobs, now.getSeconds(), secondsRadius);
   updateBlobs(minuteBlobs, now.getMinutes(), minutesRadius);
   updateBlobs(hourBlobs, now.getHours(), hoursRadius);
