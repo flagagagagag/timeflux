@@ -1,7 +1,7 @@
 const clockCanvas = document.getElementById('clockCanvas');
 const clockContext = clockCanvas.getContext('2d');
 
-clockContext.strokeStyle = "black";
+let circleColor = "gray";
 
 let clockCanvasWidth = clockCanvas.width;
 let clockCanvasHeight = clockCanvas.height;
@@ -9,7 +9,7 @@ let clockCanvasHeight = clockCanvas.height;
 const timeDisplay = document.getElementById("timeDisplay")
 
 const secondsCircleRadius = clockCanvasHeight / 2;
-const minutesCircleRadius = clockCanvasHeight / 3.5;
+const minutesCircleRadius = clockCanvasHeight / 3.25;
 const hoursCircleRadius = clockCanvasHeight / 8;
 
 const secondsSound = new Audio('assets/secondsSound.mp3'); //https://pixabay.com/de/sound-effects/slow-cinematic-clock-ticking-tension-2-323078/
@@ -19,27 +19,24 @@ const hoursSound = new Audio('assets/hoursSound.mp3'); //https://pixabay.com/de/
 let intervalId = null;
 
 
-//  Uhr passt sich an Fenstergröße an / Code von ChatGPT
+//  Uhr passt sich an Fenstergröße an
 function resizeCanvasToFullScreen() {
     const dpr = window.devicePixelRatio || 1; // z. B. 2 bei Retina
 
     // CSS-Größe in logischen Pixeln
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    clockCanvasWidth = window.innerWidth;
+    clockCanvasHeight = window.innerHeight;
 
     // Setze tatsächliche Zeichenfläche auf physische Pixel
-    clockCanvas.width = width * dpr;
-    clockCanvas.height = height * dpr;
+    clockCanvas.width = clockCanvasWidth * dpr;
+    clockCanvas.height = clockCanvasHeight * dpr;
 
     // Skaliere den Canvas-Inhalt runter, damit er optisch passt
-    clockCanvas.style.width = width + "px";
-    clockCanvas.style.height = height + "px";
+    clockCanvas.style.width = clockCanvasWidth + "px";
+    clockCanvas.style.height = clockCanvasHeight + "px";
 
     // Skaliere den Zeichenkontext für scharfes Zeichnen
     clockContext.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    clockCanvasWidth = clockCanvas.width;
-    clockCanvasHeight = clockCanvas.height;
 }
 
 
@@ -79,7 +76,7 @@ function drawMinutes(currentDate) {
     let minuteX = (minutesCircleRadius * Math.cos(Math.PI / 2)) + (clockCanvasWidth / 2);
     let minuteY = -(minutesCircleRadius * Math.sin(Math.PI / 2)) + (clockCanvasHeight / 2);
 
-    clockContext.fillStyle = "white";
+    clockContext.fillStyle = "yellow";
     let degreeForSpacingBlobs = (2 * Math.PI) / currentAmountOfMinutes;
 
     for (let i = 1; i <= currentAmountOfMinutes; i++) {
@@ -101,7 +98,7 @@ function drawHours(currentDate) {
     let hourX = (hoursCircleRadius * Math.cos(Math.PI / 2)) + (clockCanvasWidth / 2);
     let hourY = -(hoursCircleRadius * Math.sin(Math.PI / 2)) + (clockCanvasHeight / 2);
 
-    clockContext.fillStyle = "white";
+    clockContext.fillStyle = "red";
     let degreeForSpacingBlobs = (2 * Math.PI) / currentAmountOfHours;
 
     for (let i = 1; i <= currentAmountOfHours; i++) {
@@ -117,6 +114,8 @@ function drawHours(currentDate) {
 }
 
 function drawCircles() {
+
+    clockContext.strokeStyle = circleColor;
 
     //Draw Seconds Circle
     clockContext.beginPath();
@@ -173,13 +172,13 @@ document.addEventListener("keydown", function (event) {
         }
     }
     if (event.key === "w") {
-        clockContext.strokeStyle = "white";
+        circleColor = "white";
     }
     if (event.key === "b") {
-        clockContext.strokeStyle = "black";
+        circleColor = "black";
     }
     if (event.key === "g") {
-        clockContext.strokeStyle = "grey";
+        circleColor = "grey";
     }
     if (event.key === "Shift") {
         timeDisplay.style.visibility =
