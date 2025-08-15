@@ -53,10 +53,10 @@ class Blob {
     constructor(startX, startY, blobType) {
         this.x = startX;
         this.y = startY;
-        //this.targetX = startX;
-        //this.targetY = startY;
         this.blobType = blobType;
     }
+
+
 
     updatePosition(speed = 0.05) {
         const centerX = clockCanvasWidth / 2;
@@ -102,7 +102,6 @@ class Blob {
         this.x = centerX + radius * Math.cos(currentAngle);
         this.y = centerY - radius * Math.sin(currentAngle);
     }
-    
 
     draw() {
         let color
@@ -124,6 +123,20 @@ class Blob {
         clockContext.arc(this.x, this.y, 6, 0, 2 * Math.PI);
         clockContext.fill();
         clockContext.closePath();
+    } 
+}
+
+class SkippingBlob extends Blob{
+
+        constructor(startX, startY, blobType, skippingTargetY) {
+        super(startX, startY, blobType);
+        this.skippingTargetX = clockCanvasWidth / 2;
+        this.skippingTargetY = skippingTargetY;
+    }
+    
+    updateSkippingPosition(speed = 0.05){
+        this.x = this.x + ((this.skippingTargetX - this.x) * speed);
+        this.y = this.y + ((this.skippingTargetY - this.y) * speed);
     }
 }
 
@@ -154,6 +167,30 @@ function updateBlobs(array, count, radius, blobType) {
     }
     array.splice(count);
 }
+    
+let skippingBlob;
+
+function circleSkippingBlobUpdate(blobType){
+    const centerX = clockCanvasWidth / 2;
+    const centerY = clockCanvasHeight / 2;
+    let startPosition = {
+        x: centerX,
+        y: -1
+    }
+    let targetPositionY;
+
+    if (blobType == "secondBlob"){
+        targetPositionY = centerY - secondsCircleRadius;
+    }else if (blobType == "minuteBlob"){
+        startPosition = getTopOfCircle(secondsCircleRadius, centerX, centerY);
+        targetPositionY = centerY - minutesCircleRadius;
+    }else{
+        startPosition = getTopOfCircle(minutesCircleRadius, centerX, centerY);
+        targetPositionY = centerY - hoursCircleRadius;
+    }
+
+    skippingBlob = new SkippingBlob (startPosition.x, startPosition.y, blobType, targetPositionY)
+}
 
 function drawCircles() {
 
@@ -180,17 +217,21 @@ function drawCircles() {
 
 function clockLoop() {
     const currentDate = new Date;
+    let blobType = "hourBlob";
     if (currentDate.getSeconds() !== 0) {
         secondsSound.currentTime = 0;
         secondsSound.play();
+        blobType = "secondBlob";
     } else if (currentDate.getMinutes() !== 0) {
         minutesSound.currentTime = 0;
         minutesSound.play();
+        blobType = "minuteBlob";
     } else {
         hoursSound.currentTime = 0;
         hoursSound.play();
     }
 
+    circleSkippingBlobUpdate(blobType);
     updateBlobs(secondBlobs, currentDate.getSeconds(), secondsCircleRadius, "secondBlob");
     updateBlobs(minuteBlobs, currentDate.getMinutes(), minutesCircleRadius, "minuteBlob");
     updateBlobs(hourBlobs, currentDate.getHours(), hoursCircleRadius, "hourBlob");
@@ -206,6 +247,8 @@ function animate() {
     secondBlobs.forEach(b => { b.updatePosition(); b.draw(); });
     minuteBlobs.forEach(b => { b.updatePosition(); b.draw(); });
     hourBlobs.forEach(b => { b.updatePosition(); b.draw(); });
+    skippingBlob.updateSkippingPosition();
+    skippingBlob.draw();
     requestAnimationFrame(animate);
 }
 
