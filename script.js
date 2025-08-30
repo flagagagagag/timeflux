@@ -80,7 +80,7 @@ class Blob {
     
         // Aktueller Winkel (aus Position berechnet)
         const dx = this.x - centerX;
-        const dy = centerY - this.y; // canvas y ist "nach unten"
+        const dy = centerY - this.y;
         let currentAngle = Math.atan2(dy, dx);
     
         // Zielwinkel (aus targetX/Y berechnet)
@@ -110,10 +110,10 @@ class Blob {
                 color = "white";
                 break;
             case "minuteBlob":
-                color = "yellow";
+                color = "lightblue";
                 break;
             case "hourBlob":
-                color = "red";
+                color = "darkblue";
                 break;
             default:
                 color = "pink";
@@ -134,7 +134,7 @@ class SkippingBlob extends Blob{
         this.skippingTargetY = skippingTargetY;
     }
     
-    updateSkippingPosition(speed = 0.05){
+    updateSkippingPosition(speed = 0.15){
         this.x = this.x + ((this.skippingTargetX - this.x) * speed);
         this.y = this.y + ((this.skippingTargetY - this.y) * speed);
     }
@@ -158,7 +158,7 @@ function updateBlobs(array, count, radius, blobType) {
     }
 
     for (let i = 0; i < count; i++) {
-        const angle = Math.PI / 2 + i * spacing;
+        const angle = Math.PI / 2 + (i+1) * spacing;
         const targetX = centerX + radius * Math.cos(angle);
         const targetY = centerY - radius * Math.sin(angle);
 
@@ -182,10 +182,10 @@ function circleSkippingBlobUpdate(blobType){
     if (blobType == "secondBlob"){
         targetPositionY = centerY - secondsCircleRadius;
     }else if (blobType == "minuteBlob"){
-        startPosition = getTopOfCircle(secondsCircleRadius, centerX, centerY);
+        startPosition = getTopOfCircle (centerX, centerY, secondsCircleRadius);
         targetPositionY = centerY - minutesCircleRadius;
     }else{
-        startPosition = getTopOfCircle(minutesCircleRadius, centerX, centerY);
+        startPosition = getTopOfCircle(centerX, centerY, minutesCircleRadius);
         targetPositionY = centerY - hoursCircleRadius;
     }
 
@@ -244,9 +244,35 @@ function clockLoop() {
 function animate() {
     clearCanvas();
     drawCircles();
-    secondBlobs.forEach(b => { b.updatePosition(); b.draw(); });
-    minuteBlobs.forEach(b => { b.updatePosition(); b.draw(); });
-    hourBlobs.forEach(b => { b.updatePosition(); b.draw(); });
+    const currentDate = new Date;
+    const currentSeconds = currentDate.getSeconds();
+    const currentMinutes = currentDate.getMinutes();
+    const currentHours = currentDate.getHours();
+    
+    secondBlobs.forEach((b,i) => {
+        b.updatePosition();
+        if(i != currentSeconds-1){b.draw();}
+    });
+
+    if(currentSeconds == 0 && currentMinutes != 0){
+        minuteBlobs.forEach((b, i) => { 
+            b.updatePosition(); 
+            if (i != currentMinutes-1){b.draw()}; 
+        })        
+    }else{
+        minuteBlobs.forEach(b => { b.updatePosition(); b.draw(); });
+    }
+
+    if(currentSeconds == 0 && currentMinutes == 0){
+        hourBlobs.forEach((b, i) => { 
+            b.updatePosition(); 
+            if (i != currentHours-1){b.draw();}
+        })
+    }else{
+        hourBlobs.forEach(b => { b.updatePosition(); b.draw(); });
+    }
+
+
     skippingBlob.updateSkippingPosition();
     skippingBlob.draw();
     requestAnimationFrame(animate);
@@ -260,14 +286,6 @@ function animate() {
 */
 window.addEventListener("resize", resizeCanvasToFullScreen);
 document.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        resizeCanvasToFullScreen();
-        clockLoop();
-        if (intervalId === null) {
-            intervalId = setInterval(clockLoop, 1000);
-        }
-        animate();
-    }
     if (event.key === "w") {
         circleColor = "white";
     }
@@ -283,3 +301,11 @@ document.addEventListener("keydown", function (event) {
     }
 }
 );
+
+//starte programm
+    resizeCanvasToFullScreen();
+    clockLoop();
+    if (intervalId === null) {
+        intervalId = setInterval(clockLoop, 1000);
+    }
+    animate();
