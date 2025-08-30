@@ -113,7 +113,7 @@ class Blob {
                 color = "lightblue";
                 break;
             case "hourBlob":
-                color = "darkblue";
+                color = "navy";
                 break;
             default:
                 color = "pink";
